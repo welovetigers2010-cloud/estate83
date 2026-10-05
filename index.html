@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>意夏 · Estate al Mare</title>
+<meta name="theme-color" content="#0E5E7E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sea:#0E5E7E; --seaD:#0A4258; --sky:#7FC4D9; --sand:#F3E3C3; --cream:#FBF4E4;
+  --apri:#E8955C; --olive:#7A8450; --ink:#2E3A36; --ink2:#5E6B60; --gold:#D9A441;
+  --hair:rgba(46,58,54,.16); --sun:#FFE9B8;
+}
+html,body{height:100%}
+body{font-family:-apple-system,'PingFang SC','HarmonyOS Sans SC','Noto Sans SC','Microsoft YaHei',sans-serif;color:var(--ink);overflow:hidden;background:var(--sky)}
+.serif{font-family:Georgia,'Noto Serif SC','Songti SC','SimSun',serif}
+button{font-family:inherit}
+
+/* ---------- 场景 ---------- */
+#scene{position:fixed;inset:0;background:url('img/bg.png') center 55%/cover no-repeat,linear-gradient(180deg,var(--sky),var(--sand))}
+#scene::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 60% at 50% 0%,rgba(255,233,184,.34),transparent 55%),linear-gradient(180deg,transparent 55%,rgba(14,66,88,.32))}
+.grain{position:fixed;inset:0;z-index:97;pointer-events:none;opacity:.13;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+
+/* ---------- 匾 ---------- */
+.plaque{position:fixed;top:calc(env(safe-area-inset-top) + 12px);left:50%;transform:translateX(-50%);z-index:5;text-align:center;color:#FFF;
+  text-shadow:0 2px 14px rgba(10,66,88,.55)}
+.plaque h1{font-size:26px;letter-spacing:6px;font-weight:700}
+.plaque i{display:block;font-style:italic;font-size:11px;letter-spacing:3px;opacity:.92;margin-top:3px;font-family:Georgia,serif}
+
+/* ---------- 欢迎条 ---------- */
+#welcome{position:fixed;top:calc(env(safe-area-inset-top) + 96px);left:50%;transform:translateX(-50%);z-index:20;
+  background:rgba(251,244,228,.92);color:var(--ink);font-size:12.5px;letter-spacing:2px;padding:8px 20px;border-radius:999px;
+  box-shadow:0 8px 24px rgba(10,66,88,.25);opacity:0;transition:opacity .6s;pointer-events:none;white-space:nowrap}
+#welcome.on{opacity:1}
+
+/* ---------- 物件 ---------- */
+#things{position:fixed;inset:calc(env(safe-area-inset-top) + 150px) 0 calc(env(safe-area-inset-bottom) + 96px);z-index:4}
+.thing{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform .18s;-webkit-tap-highlight-color:transparent}
+.thing:active{transform:scale(.9)}
+.thing .emo{font-size:38px;line-height:1;filter:drop-shadow(0 6px 10px rgba(10,66,88,.3));transition:transform .3s}
+.thing:hover .emo{transform:translateY(-4px) rotate(-4deg)}
+.thing .lb{font-size:10.5px;letter-spacing:2px;color:#FFF;background:rgba(14,66,88,.42);padding:3px 10px;border-radius:999px;backdrop-filter:blur(3px);white-space:nowrap}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.thing.play .emo{animation:sway .9s ease}
+
+/* ---------- 明信片台 ---------- */
+#pcDock{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 104px);z-index:6;cursor:pointer;transition:transform .2s;-webkit-tap-highlight-color:transparent}
+#pcDock:active{transform:scale(.94)}
+.pcmini{width:104px;height:70px;border-radius:6px;overflow:hidden;position:relative;box-shadow:0 10px 26px rgba(10,66,88,.4);border:3px solid #FFFDF6;background:var(--cream)}
+.pcmini img{width:100%;height:100%;object-fit:cover;display:block}
+.pcmini::after{content:'Postcard';position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(10,66,88,.72));color:#FFF6E4;font-family:Georgia,serif;font-style:italic;font-size:9px;letter-spacing:1.5px;text-align:center;padding:10px 0 3px}
+.pcstack{position:absolute;inset:0;z-index:-1;border-radius:6px;background:#FFFDF6;border:3px solid #FFFDF6;transform:rotate(4deg) translate(3px,4px);box-shadow:0 8px 20px rgba(10,66,88,.3)}
+#pcDock .cap{margin-top:5px;text-align:center;font-size:10.5px;letter-spacing:2px;color:#FFF;text-shadow:0 1px 8px rgba(10,66,88,.6)}
+
+/* ---------- 底栏 ---------- */
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:15;display:flex;justify-content:center;gap:10px;
+  padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);background:linear-gradient(180deg,transparent,rgba(10,66,88,.24) 40%)}
+#dock button{border:none;cursor:pointer;background:rgba(251,244,228,.95);color:var(--ink);border-radius:14px;
+  padding:8px 16px 7px;display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.3;min-width:92px;
+  box-shadow:0 6px 18px rgba(10,66,88,.3);transition:transform .15s}
+#dock button:active{transform:scale(.94)}
+#dock button b{font-size:17px;line-height:1.1}
+#dock button span{font-size:12.5px;font-weight:700;letter-spacing:2px;white-space:nowrap}
+#dock button em{font-style:normal;font-family:Georgia,serif;font-size:9px;color:var(--ink2);letter-spacing:1.5px;text-transform:uppercase}
+#pcCount{position:absolute;top:-6px;right:-6px;background:var(--apri);color:#FFF;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:999px;display:none;align-items:center;justify-content:center;padding:0 4px}
+#dock .wrap{position:relative}
+
+/* ---------- 抽屉/面板 ---------- */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(105%);transition:transform .38s cubic-bezier(.22,.9,.3,1);
+  background:var(--cream);border-radius:18px 18px 0 0;max-height:78vh;overflow:auto;
+  padding:18px 18px calc(env(safe-area-inset-bottom) + 20px);box-shadow:0 -14px 50px rgba(10,66,88,.35)}
+.sheet.on{transform:translateY(0)}
+.sheet h3{font-family:Georgia,'Noto Serif SC',serif;font-size:17px;letter-spacing:3px;text-align:center}
+.sheet .sub{text-align:center;font-size:11px;color:var(--ink2);letter-spacing:1.5px;margin-top:2px;font-family:Georgia,serif;font-style:italic}
+.dim{position:fixed;inset:0;background:rgba(10,40,52,.45);z-index:55;opacity:0;pointer-events:none;transition:opacity .3s}
+.dim.on{opacity:1;pointer-events:auto}
+.grab{width:42px;height:4px;border-radius:99px;background:rgba(46,58,54,.2);margin:0 auto 12px}
+
+/* ---------- 明信片书写 ---------- */
+#pcForm .fronts{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+#pcForm .fronts::-webkit-scrollbar{display:none}
+#pcForm .fr{flex:0 0 auto;width:108px;cursor:pointer}
+#pcForm .fr img{width:108px;height:72px;object-fit:cover;border-radius:6px;border:3px solid transparent;transition:border .2s;display:block}
+#pcForm .fr.sel img{border-color:var(--apri);box-shadow:0 6px 16px rgba(232,149,92,.4)}
+#pcForm .fr span{display:block;text-align:center;font-size:10px;color:var(--ink2);margin-top:3px;letter-spacing:1px}
+#pcForm textarea,#pcForm input{width:100%;border:none;background:transparent;outline:none;font-family:Georgia,'Noto Serif SC','Songti SC',serif;color:var(--ink);resize:none}
+#pcForm .row2{display:flex;gap:12px;margin-top:6px}
+#pcForm .row2>div{flex:1}
+#pcForm input{font-size:14px;padding:7px 2px;border-bottom:1.4px solid var(--hair)}
+#pcForm input::placeholder,#pcForm textarea::placeholder{color:#B9AC8F}
+#pcForm .divline{border-top:1.4px solid var(--hair);margin:12px 0 4px}
+#pcForm textarea{font-size:15.5px;line-height:2;min-height:120px;letter-spacing:.5px}
+#pcStamp{width:64px;height:76px;border:1.4px dashed var(--hair);border-radius:4px;overflow:hidden;flex:0 0 auto;position:relative;background:#FFFDF6}
+#pcStamp img{width:100%;height:100%;object-fit:cover;opacity:.92}
+#pcStamp::after{content:'POSTA';position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:Georgia,serif;font-size:7px;letter-spacing:2px;color:var(--sea)}
+#pcBack{border:1.4px solid var(--hair);border-radius:10px;padding:12px;background:#FFFDF6;box-shadow:inset 0 0 30px rgba(217,164,65,.07)}
+#pcBack .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.stampmark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transform:rotate(-14deg) scale(1.4)}
+.stampmark.on{opacity:1;transform:rotate(-14deg) scale(1);transition:all .4s cubic-bezier(.2,1.4,.4,1)}
+.stampmark i{font-style:normal;border:2px solid var(--sea);color:var(--sea);border-radius:6px;padding:3px 8px;font-family:Georgia,serif;font-size:9px;letter-spacing:2px;background:rgba(251,244,228,.7)}
+.pcbtn{display:block;width:100%;margin-top:14px;border:none;cursor:pointer;background:var(--sea);color:#FFF6E4;
+  padding:13px;border-radius:999px;font-size:14px;letter-spacing:4px;font-weight:600;box-shadow:0 8px 22px rgba(14,94,126,.4);transition:transform .15s}
+.pcbtn:active{transform:scale(.97)}
+
+/* ---------- 邮筒（收藏） ---------- */
+#mailList .mi{display:flex;gap:12px;align-items:center;padding:11px 4px;border-bottom:1.4px dashed var(--hair)}
+#mailList .mi img{width:64px;height:44px;object-fit:cover;border-radius:4px;border:2px solid #FFFDF6;box-shadow:0 3px 8px rgba(10,66,88,.2)}
+#mailList .mi .t{flex:1;min-width:0}
+#mailList .mi .t b{font-size:13.5px;letter-spacing:1px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mailList .mi .t i{font-style:normal;font-size:10.5px;color:var(--ink2);letter-spacing:1px}
+#mailList .mi button{border:1.2px solid var(--sea);background:none;color:var(--sea);font-size:10.5px;letter-spacing:1px;padding:5px 10px;border-radius:999px;cursor:pointer}
+.empty2{text-align:center;padding:26px 0;color:var(--ink2);font-size:12.5px;letter-spacing:2px}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 96px);transform:translateX(-50%) translateY(14px);z-index:80;
+  background:rgba(20,45,56,.92);color:#FFF6E4;font-size:12.5px;letter-spacing:1.5px;padding:10px 22px;border-radius:999px;
+  opacity:0;transition:all .35s;pointer-events:none;max-width:86vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- 存图覆盖 ---------- */
+#saveOv{position:fixed;inset:0;z-index:95;background:rgba(8,36,48,.93);display:none;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 14px);overflow:auto}
+#saveOv.on{display:flex}
+.saveTip{color:var(--sun);font-size:13px;letter-spacing:2px;margin:6px 0 12px;font-family:Georgia,'Noto Serif SC',serif}
+#saveImg{width:100%;max-width:420px;border-radius:4px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+#saveClose{margin-top:16px;background:var(--cream);border:none;border-radius:999px;padding:10px 34px;font-size:13px;letter-spacing:3px;color:var(--ink);cursor:pointer}
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div class="grain"></div>
+
+<div class="plaque serif"><h1>意 夏</h1><i>Estate al Mare · MMXCVIII? no — Estate '83</i></div>
+<div id="welcome" class="serif">Benvenuto · 海风把椅子吹凉了，坐吧</div>
+
+<div id="things"></div>
+
+<div id="pcDock">
+  <div class="pcstack"></div>
+  <div class="pcmini"><img src="img/pc1.png" alt="" onerror="this.style.display='none'"></div>
+  <div class="cap">写张明信片</div>
+</div>
+
+<div id="dock">
+  <div class="wrap"><button id="btnThings"><b>☀️</b><span>院子</span><em>Things</em></button></div>
+  <div class="wrap"><button id="btnWrite"><b>✉️</b><span>明信片</span><em>Write</em></button><i id="pcCount"></i></div>
+  <div class="wrap"><button id="btnMail"><b>📮</b><span>邮筒</span><em>Mailbox</em></button><i id="pcCount2" style="display:none"></i></div>
+</div>
+
+<div class="dim" id="dim"></div>
+
+<!-- 明信片书写 -->
+<div class="sheet" id="writeSheet">
+  <div class="grab"></div>
+  <h3 class="serif">写一张明信片</h3>
+  <div class="sub">Scrivi una cartolina · 寄给未来的某个人</div>
+  <div id="pcForm" style="margin-top:14px">
+    <div class="fronts" id="fronts"></div>
+    <div id="pcBack">
+      <div class="top">
+        <div class="row2" style="flex:1;margin:0">
+          <div><input id="pcTo" placeholder="To · 寄给谁"></div>
+          <div><input id="pcPlace" placeholder="Da · 在哪里"></div>
+        </div>
+        <div id="pcStamp"><img id="stampImg" src="img/pc1.png" alt="" onerror="this.style.display='none'"></div>
+      </div>
+      <div class="divline"></div>
+      <textarea id="pcMsg" placeholder="今天 sea 是绿色的，风从海面来……&#10;（想说的话，都写在这里）"></textarea>
+    </div>
+    <button class="pcbtn serif" id="pcSend">盖 戳 寄 出</button>
+  </div>
+</div>
+
+<!-- 邮筒 -->
+<div class="sheet" id="mailSheet">
+  <div class="grab"></div>
+  <h3 class="serif">邮筒 · 已寄出的明信片</h3>
+  <div class="sub">dalla spiaggia · 每一张都盖了海风的邮戳</div>
+  <div id="mailList" style="margin-top:10px"></div>
+</div>
+
+<!-- 物件说明 -->
+<div class="sheet" id="thingSheet">
+  <div class="grab"></div>
+  <div id="thingBody" style="text-align:center;padding:6px 4px 2px"></div>
+</div>
+
+<div id="toast" class="serif"></div>
+
+<div id="saveOv">
+  <div class="saveTip">长按图片 · 保存这张明信片 🖼</div>
+  <img id="saveImg" alt="postcard">
+  <button id="saveClose">收好</button>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("on"),2400)}
+
+/* ============ 物件 ============ */
+const THINGS=[
+ {e:"🍑",n:"杏",t:"杏树",d:"咬下去的瞬间，夏天就具体了。"},
+ {e:"🌊",n:"海",t:"海",d:"海水把所有心事，都算作盐。"},
+ {e:"🎶",n:"唱机",t:"黑胶唱机",d:"33 转的下午，一首歌被拉得很长。"},
+ {e:"🚲",n:"单车",t:"旧单车",d:"去镇上取书，来回十四公里，只为晒透。"},
+ {e:"📖",n:"书",t:"摊开的书",d:"树影里翻页，风也读了几行。"},
+ {e:"🍋",n:"柠檬水",t:"柠檬汽水",d:"冰块晃着，叮叮当当。"},
+ {e:"🕶️",n:"墨镜",t:"墨镜",d:"戴上它，目光就有了去处。"},
+ {e:"🎸",n:"吉他",t:"靠着的吉他",d:"三个和弦，也能弹完一个夏天。"},
+];
+const POS=[[8,6],[78,4],[42,2],[6,30],[80,32],[44,26],[10,54],[78,58]];
+$("#things").innerHTML=THINGS.map((t,i)=>`<div class="thing" data-i="${i}" style="left:${POS[i][0]}%;top:${POS[i][1]}%"><span class="emo">${t.e}</span><span class="lb">${t.n}</span></div>`).join("");
+$("#things").addEventListener("click",e=>{
+  const el=e.target.closest(".thing");if(!el)return;
+  const t=THINGS[+el.dataset.i];
+  el.classList.remove("play");void el.offsetWidth;el.classList.add("play");
+  $("#thingBody").innerHTML=`<div style="font-size:52px;line-height:1.2">${t.e}</div>
+    <h3 class="serif" style="margin-top:4px">${t.t}</h3>
+    <p class="serif" style="font-size:16px;line-height:2;color:var(--ink);margin-top:10px;letter-spacing:1px">${t.d}</p>
+    <div style="font-size:10.5px;color:var(--ink2);letter-spacing:2px;margin-top:8px;font-family:Georgia,serif;font-style:italic">Estate al Mare</div>`;
+  openSheet("thingSheet");
+});
+
+/* ============ 抽屉 ============ */
+function openSheet(id){$("#dim").classList.add("on");$("#"+id).classList.add("on")}
+function closeSheets(){document.querySelectorAll(".sheet").forEach(x=>x.classList.remove("on"));$("#dim").classList.remove("on")}
+$("#dim").addEventListener("click",closeSheets);
+
+/* ============ 明信片 ============ */
+const FRONTS=[
+ {id:"pc1",n:"海边小镇"},
+ {id:"pc2",n:"杏树"},
+ {id:"pc3",n:"单车小巷"},
+ {id:"pc4",n:"沙滩阳伞"},
+];
+let selFront=FRONTS[0].id;
+$("#fronts").innerHTML=FRONTS.map(f=>`<div class="fr${f.id===selFront?" sel":""}" data-id="${f.id}"><img src="img/${f.id}.png" alt="${f.n}" loading="lazy" onerror="this.parentNode.style.opacity=.4"><span>${f.n}</span></div>`).join("");
+$("#fronts").addEventListener("click",e=>{
+  const el=e.target.closest(".fr");if(!el)return;
+  selFront=el.dataset.id;
+  document.querySelectorAll(".fr").forEach(x=>x.classList.toggle("sel",x.dataset.id===selFront));
+  $("#stampImg").style.display="";$("#stampImg").src="img/"+selFront+".png";
+});
+let MAIL=[];try{MAIL=JSON.parse(localStorage.getItem("estate_mail")||"[]")}catch(e){}
+function updCount(){["pcCount","pcCount2"].forEach(id=>{const el=document.getElementById(id);if(!el)return;
+  if(MAIL.length){el.style.display="flex";el.textContent=MAIL.length}else el.style.display="none"})}
+function updMailList(){
+  $("#mailList").innerHTML=MAIL.length?MAIL.map((m,i)=>`<div class="mi"><img src="img/${m.f}.png" alt="" onerror="this.style.opacity=.3"><div class="t"><b>${m.to||"给无名的人"}</b><i>${m.date} · ${m.place||"海边"}</i></div><button data-i="${i}" class="sav">存图</button></div>`).join(""):'<div class="empty2">邮筒还空着 —— 去写第一张吧。</div>';
+}
+$("#btnWrite").addEventListener("click",()=>{openSheet("writeSheet")});
+$("#btnMail").addEventListener("click",()=>{updMailList();openSheet("mailSheet")});
+$("#btnThings").addEventListener("click",()=>toast("院子里都是夏天 —— 点点看。"));
+$("#pcDock").addEventListener("click",()=>openSheet("writeSheet"));
+$("#mailList").addEventListener("click",e=>{
+  const b=e.target.closest(".sav");if(!b)return;
+  drawCard(MAIL[+b.dataset.i]);
+});
+$("#pcSend").addEventListener("click",()=>{
+  const msg=$("#pcMsg").value.trim(),to=$("#pcTo").value.trim(),pl=$("#pcPlace").value.trim();
+  if(!msg&&!to){toast("写点什么再寄吧。");return}
+  const m={f:selFront,to,place:pl||"意大利 · 海边",msg,at:Date.now(),
+    date:new Date().getFullYear()+"."+(new Date().getMonth()+1)+"."+new Date().getDate()};
+  MAIL.unshift(m);localStorage.setItem("estate_mail",JSON.stringify(MAIL));
+  const mk=document.createElement("div");mk.className="stampmark on";
+  mk.innerHTML='<i>ESTATE 1983 · DAL MARE</i>';$("#pcStamp").appendChild(mk);
+  updCount();
+  toast("盖了戳 —— 这张从海边寄出去了 ✉");
+  setTimeout(()=>{
+    $("#pcMsg").value="";$("#pcTo").value="";
+    const old=document.querySelector(".stampmark");if(old)old.remove();
+    closeSheets();updMailList();openSheet("mailSheet");
+  },1100);
+});
+updCount();
+
+/* ============ 存图：canvas 明信片 ============ */
+function wrapText(x,text,maxW){const out=[];let line="";
+  for(const ch of text){if(ch==="\n"){out.push(line);line="";continue}
+    if(x.measureText(line+ch).width>maxW){out.push(line);line=ch}else line+=ch}
+  out.push(line);return out}
+function serif(sz,w){return (w?w+" ":"")+sz+"px Georgia,'Noto Serif SC','Songti SC','SimSun',serif"}
+function drawCard(m){
+  const cv=document.createElement("canvas");cv.width=780;cv.height=1090;const x=cv.getContext("2d");
+  x.fillStyle="#FBF4E4";x.fillRect(0,0,780,1090);
+  x.globalAlpha=.05;x.fillStyle="#0E5E7E";
+  for(let i=0;i<380;i++)x.fillRect(Math.random()*780,Math.random()*1090,1.6,1.6);
+  x.globalAlpha=1;
+  x.strokeStyle="#D9C79B";x.lineWidth=2.5;x.strokeRect(30,30,720,1030);
+  x.lineWidth=1;x.strokeRect(40,40,700,1010);
+  // 正面缩图做邮票
+  const im=new Image();
+  im.onload=()=>{x.drawImage(im,560,84,150,110);x.strokeStyle="#D9C79B";x.lineWidth=1.5;x.strokeRect(560,84,150,110);rest()};
+  im.onerror=()=>rest();
+  im.src="img/"+m.f+".png";
+  function rest(){
+    x.fillStyle="#0E5E7E";x.font=serif(15);x.textAlign="center";
+    x.fillText("C A R T O L I N A · 意 夏",390,86);
+    x.beginPath();x.moveTo(300,112);x.lineTo(480,112);x.stroke();
+    x.textAlign="left";x.fillStyle="#2E3A36";
+    x.font=serif(27,"bold");x.fillText("To · "+(m.to||"无名的人"),84,178);
+    x.font=serif(19);x.fillStyle="#5E6B60";x.fillText("Da · "+(m.place||"海边"),84,214);
+    x.strokeStyle="#D9C79B";x.beginPath();x.moveTo(84,232);x.lineTo(540,232);x.stroke();
+    // 邮戳
+    x.save();x.translate(636,232);x.rotate(-.16);
+    x.strokeStyle="#0E5E7E";x.lineWidth=2;x.globalAlpha=.75;
+    x.beginPath();x.arc(0,0,52,0,7);x.stroke();
+    x.beginPath();x.arc(0,0,44,0,7);x.stroke();
+    x.fillStyle="#0E5E7E";x.textAlign="center";x.font=serif(13);
+    x.fillText("ESTATE",0,-16);x.fillText("AL MARE",0,0);x.font=serif(12);x.fillText(m.date,0,18);
+    x.restore();x.globalAlpha=1;
+    // 正文
+    x.font=serif(25);x.fillStyle="#33403A";x.textAlign="left";
+    const lines=wrapText(x,m.msg||"",600);const lh=44;let ty=306;const maxY=930;
+    const show=lines.slice(0,Math.floor((maxY-306)/lh));
+    show.forEach((ln,i)=>x.fillText(ln,84,306+i*lh));
+    if(lines.length>show.length){x.fillStyle="#8FA69B";x.font=serif(19);x.fillText("……（写在心里，没占满卡片）",84,maxY)}
+    // 落款
+    x.textAlign="right";x.fillStyle="#5E6B60";x.font=serif(19);
+    x.fillText("写于海边 · Estate al Mare",688,1012);
+    x.textAlign="center";x.fillStyle="#0E5E7E";x.font=serif(15);
+    x.fillText("MMXXXV? — 写给你的夏天",390,1046);
+    const url=cv.toDataURL("image/png");
+    $("#saveImg").src=url;$("#saveOv").classList.add("on");
+    try{const a=document.createElement("a");a.href=url;a.download="意夏明信片-"+(m.to||"你")+".png";document.body.appendChild(a);a.click();a.remove()}catch(e){}
+  }
+}
+$("#saveClose").addEventListener("click",()=>$("#saveOv").classList.remove("on"));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeSheets();$("#saveOv").classList.remove("on")}});
+
+setTimeout(()=>{$("#welcome").classList.add("on");setTimeout(()=>$("#welcome").classList.remove("on"),3400)},700);
+</script>
+</body>
+</html>
