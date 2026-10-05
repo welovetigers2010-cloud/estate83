@@ -320,7 +320,7 @@ function drawCard(m){
     x.textAlign="right";x.fillStyle="#5E6B60";x.font=serif(19);
     x.fillText("写于海边 · Estate al Mare",688,1012);
     x.textAlign="center";x.fillStyle="#0E5E7E";x.font=serif(15);
-    x.fillText("MMXXXV? — 写给你的夏天",390,1046);
+    x.fillText("MCMLXXXIII · 写给你的夏天",390,1046);
     const url=cv.toDataURL("image/png");
     $("#saveImg").src=url;$("#saveOv").classList.add("on");
     try{const a=document.createElement("a");a.href=url;a.download="意夏明信片-"+(m.to||"你")+".png";document.body.appendChild(a);a.click();a.remove()}catch(e){}
